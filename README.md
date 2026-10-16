@@ -6,7 +6,9 @@ LinkHub 是一个基于 Spring Cloud Alibaba 构建的高并发短链接平台�
 
 ## 技术栈
 
-**Spring Boot / Spring Cloud Alibaba / Redis / Caffeine / RocketMQ / ShardingSphere / MySQL / Redisson / Sentinel**
+后端：**Spring Boot / Spring Cloud Alibaba / Redis / Caffeine / RocketMQ / ShardingSphere / MySQL / Redisson / Sentinel**
+<br>
+前端：**Vue 3 / Vite / Element Plus**
 
 ## 核心设计
 
