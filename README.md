@@ -56,3 +56,6 @@ LinkHub
 
 ![压测截图](image.png)
 
+### UI Preview
+![登录界面](uiPreview1.png)
+![管理界面](uiPreview2.png)
