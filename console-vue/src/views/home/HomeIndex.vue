@@ -3,36 +3,8 @@
     <el-container>
       <el-header height="54px" style="padding: 0">
         <div class="header">
-          <div @click="toMySpace" class="logo">拿个offer-SaaS短链接@马丁</div>
+          <div @click="toMySpace" class="logo">LinkHub 智能短链接平台</div>
           <div style="display: flex; align-items: center">
-            <a
-              class="link-span"
-              style="text-decoration: none"
-              target="_blank"
-              href="https://nageoffer.com/shortlink/"
-              >官方文档</a
-            >
-            <a
-              class="link-span"
-              style="text-decoration: none"
-              target="_blank"
-              href="https://nageoffer.com/planet/group/"
-              >加沟通群</a
-            >
-            <a
-                class="link-span"
-                style="text-decoration: none"
-                target="_blank"
-                href="https://nageoffer.com/shortlink/video/"
-            >🔥视频教程</a
-            >
-            <a
-                class="link-span"
-                style="text-decoration: none"
-                target="_blank"
-                href="http://shortlink.nageoffer.com"
-            >演示环境</a
-            >
             <el-dropdown>
               <div class="block">
                 <span

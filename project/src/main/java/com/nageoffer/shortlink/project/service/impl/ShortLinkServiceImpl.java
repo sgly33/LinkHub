@@ -610,39 +610,103 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         return shorUri;
     }
 
-    // 根据一个网站 URL，尝试获取该网站的 favicon（网站图标）地址
-    private String getFavicon(String url) {
+    private Map<String, String> getWebsiteMetadata(String url) {
+        Map<String, String> result = new HashMap<>();
+        result.put("favicon", null);
+        result.put("description", null);
+
         try {
             URL targetUrl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(500);
-            connection.setReadTimeout(500);
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            if (HttpURLConnection.HTTP_OK != responseCode) {
-                return null;
-            }
+            String protocol = targetUrl.getProtocol();
+            String host = targetUrl.getHost();
+            int port = targetUrl.getPort();
+            String baseUrl = port == -1 ? protocol + "://" + host : protocol + "://" + host + ":" + port;
+
             Document document = Jsoup.connect(url)
-                    .timeout(800)
-                    .userAgent("Mozilla/5.0")
+                    .timeout(500)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
                     .followRedirects(true)
+                    .ignoreHttpErrors(true)
+                    .ignoreContentType(true)
                     .get();
-            Element faviconLink = document.select("link[rel~=(?i)^(shortcut )?icon]").first();
+
+            // 尝试多种方式获取 favicon
+            String faviconUrl = null;
+
+            // 1. 尝试 link[rel="icon"]
+            Element faviconLink = document.select("link[rel='icon']").first();
             if (faviconLink == null) {
-                return null;
+                // 2. 尝试 link[rel="shortcut icon"]
+                faviconLink = document.select("link[rel='shortcut icon']").first();
             }
-            String absHref = faviconLink.attr("abs:href");
-            if (StrUtil.isNotBlank(absHref)) {
-                return absHref;
+            if (faviconLink == null) {
+                // 3. 尝试任何包含 icon 的 rel
+                faviconLink = document.select("link[rel~=(?i)icon]").first();
             }
-            // 兜底：部分页面无法生成 abs:href 时，返回原始 href
-            String href = faviconLink.attr("href");
-            return StrUtil.isBlank(href) ? null : href;
+
+            if (faviconLink != null) {
+                String href = faviconLink.attr("href");
+                log.debug("找到 favicon link，href={}", href);
+
+                if (StrUtil.isNotBlank(href)) {
+                    // 使用 absUrl 自动处理绝对路径
+                    faviconUrl = faviconLink.absUrl("href");
+
+                    // 如果 absUrl 失败，手动处理
+                    if (StrUtil.isBlank(faviconUrl)) {
+                        if (href.startsWith("//")) {
+                            faviconUrl = protocol + ":" + href;
+                        } else if (href.startsWith("/")) {
+                            faviconUrl = baseUrl + href;
+                        } else if (href.startsWith("http://") || href.startsWith("https://")) {
+                            faviconUrl = href;
+                        } else {
+                            faviconUrl = baseUrl + "/" + href;
+                        }
+                    }
+                    log.debug("解析后的 favicon URL={}", faviconUrl);
+                }
+            } else {
+                log.debug("未在 HTML 中找到 favicon link 标签，url={}", url);
+            }
+
+            // 兜底：尝试默认 /favicon.ico
+            if (StrUtil.isBlank(faviconUrl)) {
+                faviconUrl = baseUrl + "/favicon.ico";
+                log.debug("使用默认 favicon 路径: {}", faviconUrl);
+            }
+
+            result.put("favicon", faviconUrl);
+
+            // 获取 description
+            Element metaDesc = document.select("meta[name=description]").first();
+            if (metaDesc != null) {
+                String description = metaDesc.attr("content");
+                if (StrUtil.isNotBlank(description)) {
+                    result.put("description", description.length() > 200 ? description.substring(0, 200) : description);
+                }
+            }
+
+            // 兜底：尝试 og:description
+            if (StrUtil.isBlank(result.get("description"))) {
+                Element ogDesc = document.select("meta[property=og:description]").first();
+                if (ogDesc != null) {
+                    String description = ogDesc.attr("content");
+                    if (StrUtil.isNotBlank(description)) {
+                        result.put("description", description.length() > 200 ? description.substring(0, 200) : description);
+                    }
+                }
+            }
+
         } catch (Exception ex) {
-            log.warn("获取 favicon 失败，url={}", url, ex);
-            return null;
+            log.warn("获取网站元数据失败，url={}, 异常类型={}, 异常信息={}", url, ex.getClass().getSimpleName(), ex.getMessage());
         }
+
+        return result;
+    }
+
+    private String getFavicon(String url) {
+        return getWebsiteMetadata(url).get("favicon");
     }
 
     private void verificationWhitelist(String originUrl) {

@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <h1 class="title">SaaS 短 链 接 平 台(马丁)</h1>
+    <h1 class="title">LinkHub 智能短链接平台</h1>
     <div class="login-box">
       <!-- 登录 -->
       <div class="logon" :class="{ hidden: !isLogin }">
@@ -8,14 +8,14 @@
         <el-form ref="loginFormRef1" :model="loginForm" label-width="50px" :rules="loginFormRule">
           <div class="form-container1">
             <el-form-item prop="phone">
-              <el-input v-model="loginForm.username" placeholder="请输入用户名" maxlength="11" show-word-limit clearable>
+              <el-input v-model="loginForm.username" placeholder="请输入用户名" maxlength="11" show-word-limit clearable style="width: 500px; height: 60px; font-size: 25px;">
                 <template v-slot:prepend> 用户名 </template>
               </el-input>
             </el-form-item>
 
-            <el-form-item prop="password">
+            <el-form-item prop="password"> 
               <el-input v-model="loginForm.password" type="password" clearable placeholder="请输入密码" show-password
-                style="margin-top: 20px">
+              style="width: 500px; height: 60px; font-size: 25px; margin-top: 20px;">
                 <template v-slot:prepend> 密<span class="second-font">码</span> </template>
               </el-input>
             </el-form-item>
@@ -102,25 +102,6 @@
     </div>
     <div ref="vantaRef" class="vanta"></div>
   </div>
-  <el-dialog v-model="isWC" title="人机验证" width="40%" :before-close="handleClose">
-    <div class="verification-flex">
-      <span>扫码下方二维码，关注后回复：<strong><span style="color:blue;">link</span></strong>，获取拿个offer-SaaS短链接系统人机验证码</span>
-      <img class="img" src="@/assets/png/公众号二维码.png" alt="">
-      <el-form class="form" :model="verification" :rules="verificationRule" ref="verificationRef">
-        <el-form-item prop="code" label="验证码">
-          <el-input v-model="verification.code" />
-        </el-form-item>
-      </el-form>
-    </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="isWC = false">取消</el-button>
-        <el-button type="primary" @click="verificationLogin(verificationRef)">
-          确认
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
   <!-- </template> -->
 </template>
 
@@ -131,6 +112,9 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import * as THREE from 'three'
 import WAVES from 'vanta/src/vanta.waves'
+import CLOUDS2 from 'vanta/src/vanta.clouds2'
+import NET from 'vanta/src/vanta.net'
+
 const { proxy } = getCurrentInstance()
 const API = proxy.$API
 const loginFormRef1 = ref()
@@ -262,15 +246,14 @@ const verificationLogin = (formEl) => {
 }
 // 登录
 const login = (formEl) => {
+  // localStorage.setItem('token', 'fake-token-123')       // ← 塞假 token
+  // localStorage.setItem('username', loginForm.username)  // ← 塞用户名
+  // router.push('/home')
+  // router.push('/home')
+  // return
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
-      // 当域名为下面这两个时，弹出公众号弹框
-      // let domain = window.location.host
-      // if (domain === 'shortlink.magestack.cn' || domain === 'shortlink.nageoffer.com') {
-      //   isWC.value = true
-      //   return
-      // }
       const res1 = await API.user.login(loginForm)
       if (res1.data.code === '0') {
         const token = res1?.data?.data?.token
@@ -309,17 +292,32 @@ const checked = ref(true)
 const vantaRef = ref()
 // 动态背景
 let vantaEffect = null
+// onMounted(() => {
+//   vantaEffect = WAVES({
+//     el: vantaRef.value,
+//     THREE: THREE,
+//     mouseControls: true,
+//     touchControls: true,
+//     gyroControls: false,
+//     minHeight: 200.0,
+//     minWidth: 200.0,
+//     scale: 1.0,
+//     scaleMobile: 1.0
+//   })
+// })
 onMounted(() => {
-  vantaEffect = WAVES({
+  vantaEffect = NET({
     el: vantaRef.value,
     THREE: THREE,
+    backgroundColor: 0x0,
+    color: 0xe1e1e1,
     mouseControls: true,
     touchControls: true,
-    gyroControls: false,
-    minHeight: 200.0,
-    minWidth: 200.0,
-    scale: 1.0,
-    scaleMobile: 1.0
+    gyroControls: true,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    scale: 1.00,
+    scaleMobile: 1.00
   })
 })
 onBeforeUnmount(() => {
@@ -332,28 +330,26 @@ const isLogin = ref(true)
 const moveRef = ref() // 左右移动的切换按钮模块
 const changeLogin = () => {
   let domain = window.location.host
-  if (domain === 'shortlink.magestack.cn' || domain === 'shortlink.nageoffer.com') {
-    ElMessage.warning('演示环境暂不支持注册')
-    return
-  }
   isLogin.value = !isLogin.value
   if (isLogin.value) {
     moveRef.value.style.transform = 'translate(0, 0)'
   } else {
-    moveRef.value.style.transform = 'translate(-420px, 0)'
+    moveRef.value.style.transform = 'translate(-600px, 0)'
   }
 }
 </script>
 
+<!-- 如果style标签加入了scoped标识，那就表明这个样式只作用于当前组件，不影响子组件 -->
 <style lang="less" scoped>
 .login-box {
-  border: 2px solid #0984e3;
+  border: 0px solid #0984e3;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   border-radius: 20px;
-  padding: 0 40px 0 40px;
-  width: 700px;
+  padding: 0px 0px 0 50px;
+  width: 1000px;
+  height: 550px;
   // background-color: #eee;
   position: absolute;
   z-index: 999;
@@ -362,12 +358,13 @@ const changeLogin = () => {
   transform: translate(-50%, -50%);
   box-sizing: border-box;
   // border: 1px solid #eee;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(241, 240, 240, 0.849);
   background-color: #fff;
   animation: hideIndex 0.5s;
+  margin: 0px;
 
   h2 {
-    font-size: 30px;
+    font-size: 45px;
     font-family:
       PingFangSC-Semibold,
       PingFang SC;
@@ -375,33 +372,37 @@ const changeLogin = () => {
     color: #3a3f63;
     width: 100%;
     text-align: center;
-    padding: 20px;
+    padding: 40px;
   }
 
   .el-form-item {
-    margin-bottom: 23px;
+    margin-bottom: 10px;
   }
 
   .btn-gourp {
-    margin-top: 30px;
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    align-items: center; 
 
     .el-button {
-      width: 100px;
+      width: 140px;
+      height : 40px;
+      font-size: 25px;
     }
 
     .remeber-password {
-      left: 0;
-      line-height: 0.5rem;
+      left: 0px;
+      :deep(.el-checkbox__label) {
+        font-size: 25px;
+      }
     }
   }
 
   .el-checkbox {
     width: 100%;
     text-align: center;
-    margin-top: 1rem;
   }
 }
 
@@ -441,6 +442,7 @@ const changeLogin = () => {
 
 .logon {
   display: flex;
+  width: 50%;
   flex-direction: column;
   justify-content: space-between;
 }
@@ -481,18 +483,33 @@ const changeLogin = () => {
   background: -webkit-linear-gradient(to right, #0984e3, #0984e3);
   /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right,
-      #1a8fd5,
-      #0984e3);
+      #537692,
+      #1a74c4);
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
+.register {
+  transform: translate(-50px);
+  :deep(.el-form-item__content) {
+    display: flex;
+    justify-content: center;   /* ← 内容居中 */
+    margin-left: 0 !important;
+  }
+
+  .el-input {
+    width: 400px;              /* 或 100% */
+    height: 40px;
+    font-size: 25px;
+    margin: 0 0 10px 0;        /* 左右不需要 auto 了 */
+  }
+}
 .title {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   top: 15%;
   z-index: 999;
-  font-size: 40px;
+  font-size: 60px;
   color: #fff;
   font-weight: bolder;
 }
@@ -502,7 +519,8 @@ const changeLogin = () => {
 }
 
 .form-container1 {
-  transform: translateY(-80%);
+  transform: translateY(-70%);
+  margin-bottom: 10px;
 }
 
 .second-font {
