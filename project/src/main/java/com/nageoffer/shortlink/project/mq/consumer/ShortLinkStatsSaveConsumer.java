@@ -46,9 +46,8 @@ import java.util.Map;
         topic = "${rocketmq.producer.topic}",
         consumerGroup = "${rocketmq.consumer.group}",
         maxReconsumeTimes = 3,  //  最多重试 3 次；
-        delayLevelWhenNextConsume = 9 //  按 RocketMQ 延迟级别重试，常见默认延迟级别里 level 9 是约 3 分钟。
-
-
+        delayLevelWhenNextConsume = 9 //  按 RocketMQ 延迟级别重试，常见默认延迟级别里 level 9 是约 5 分钟。
+        // 也就是说每次消费失败后，都等待 level 9 对应的延迟时间（约 5 分钟）再重试，最多重试 3 次。
 )
 public class ShortLinkStatsSaveConsumer implements RocketMQListener<Map<String, String>> {
 

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 消息队列幂等处理器
- * 公众号：马丁玩编程，回复：加群，添加马哥微信（备注：link）获取项目资料
+ * 也就是使用redis做消息的幂等处理，key为业务的ID，然后value为0则表示消息正在被处理 value为1代表这个消息已经被成功消费完毕
  */
 @Component
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class MessageQueueIdempotentHandler {
 
     /**
      * 判断当前消息是否消费过
-     *
+     * setIfAbsent函数 如果set成功则返回true  否则返回false
      * @param messageId 消息唯一标识
      * @return 消息是否消费过
      */

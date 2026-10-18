@@ -53,3 +53,4 @@ rocketmq:
     retry-times-when-send-async-failed: 1
   consumer:
     group: short-link_project-service_stats-save_cg
+#    单实例默认有20个消费线程
