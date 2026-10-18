@@ -54,7 +54,7 @@ LinkHub
 
 ### 压测截图
 
-![压测截图](image.png)
+![压测截图](fTest.png)
 
 ### UI Preview
 ![登录界面](uiPreview1.png)
