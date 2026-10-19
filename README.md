@@ -59,3 +59,13 @@ LinkHub
 ### UI Preview
 ![登录界面](uiPreview1.png)
 ![管理界面](uiPreview2.png)
+
+###   模块作用：
+- Project：核心业务（短链接的CRUD、跳转、统计）
+- Admin：管理后台（用户管理、调用Project）
+- Gateway：统一入口（路由、鉴权）
+
+### 启动顺序：
+1. Project（被依赖，最底层）
+2. Admin（依赖Project）
+3. Gateway（依赖Admin和Project）
